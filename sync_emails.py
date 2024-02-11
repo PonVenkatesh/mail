@@ -56,7 +56,6 @@ class Gmail:
         # The file token.json stores the user's access and refresh tokens
         if os.path.exists("token.json"):
             creds = Credentials.from_authorized_user_file("token.json")
-
         # If credentials are not available or are invalid, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
@@ -114,6 +113,9 @@ class Gmail:
 
     def list_emails(self, query=""):
         # List emails based on a query (default is all emails)
+        # labels = self.service.users().labels().list(userId='me').execute()
+        # print(labels)
+        # return []
         results = self.service.users().messages().list(userId="me", q=query).execute()
         messages = results.get("messages", [])
         return messages

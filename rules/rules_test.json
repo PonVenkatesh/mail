@@ -1,18 +1,29 @@
 {
   "rules": [
     {
-      "name": "sender:icici",
+      "name": "xxxx",
       "conditions": [
+        {
+          "field": "received_at",
+          "operator": "less_than",
+          "value": 18,
+          "metric": "hours"
+        },
         {
           "field": "sender_id",
           "operator": "contains",
-          "value": "icici"
+         "value": "icici"
         }
       ],
+      "conditions_relation": "AND",
       "actions": [
         {
-          "action": "move_message",
-          "move_to": "ICICI"
+          "action": "move_to",
+          "value": "Label_7351968963661624697"
+        },
+        {
+          "action": "mark_as",
+          "value": "unread"
         }
       ]
     }
