@@ -1,0 +1,45 @@
+{
+  "rules": [
+    {
+      "name": "sender:icici",
+      "conditions": [
+        {
+          "field": "sender_id",
+          "operator": "contains",
+          "value": "icici"
+        }
+      ],
+      "actions": [
+        {
+          "action": "move_message",
+          "move_to": "ICICI"
+        }
+      ]
+    },
+     {
+      "name": "mutual_fund_attachment",
+      "conditions": [
+        {
+          "field": "attachment",
+          "operator": "exists"
+        },
+        {
+          "field": "subject",
+          "operator": "contains",
+          "value": "mutual"
+        }
+      ],
+       "conditions_relation": "AND",
+      "actions": [
+        {
+          "action": "move_message",
+          "move_to": "MF Attachments"
+        },
+        {
+          "action": "mark_as",
+          "value": "UNREAD"
+        }
+      ]
+    }
+  ]
+}
