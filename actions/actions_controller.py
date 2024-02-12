@@ -26,6 +26,7 @@ class ActionsController:
                     self.add_label_ids.append("UNREAD")
             else:
                 print(" Invalid Action : {}".format(action.get("action")))
+                raise "Invalid Action"
         return self
 
     def perform(self):
@@ -40,11 +41,9 @@ class ActionsController:
             if self.add_label_ids:
                 modify_request["addLabelIds"] = self.add_label_ids
         self.batch_update(modify_request)
-        # Set the Authorization header with the access token
 
     def batch_update(self, request_payload):
         def get_access_token():
-            # Perform OAuth 2.0 authentication to obtain an access token
             if os.path.exists(os.getcwd() + "/token.json"):
                 with open(os.getcwd() + "/token.json", 'r') as json_file:
                     try:
@@ -53,7 +52,6 @@ class ActionsController:
                     except:
                         print(" access token extraction failed, Re-authenticate")
                         return None
-
             return None
 
         if not request_payload:

@@ -1,7 +1,7 @@
 {
   "rules": [
     {
-      "name": "sender:icici",
+      "name": "icici mails",
       "conditions": [
         {
           "field": "sender_id",
@@ -11,12 +11,12 @@
       ],
       "actions": [
         {
-          "action": "move_message",
-          "move_to": "ICICI"
+          "action": "move_to",
+          "value": "Label_7351968963661624697"
         }
       ]
     },
-     {
+    {
       "name": "mutual_fund_attachment",
       "conditions": [
         {
@@ -29,15 +29,15 @@
           "value": "mutual"
         }
       ],
-       "conditions_relation": "AND",
+      "conditions_relation": "AND",
       "actions": [
         {
-          "action": "move_message",
-          "move_to": "MF Attachments"
+          "action": "move_to",
+          "value": "Label_3569484908781157165"
         },
         {
           "action": "mark_as",
-          "value": "UNREAD"
+          "value": "unread"
         }
       ]
     }

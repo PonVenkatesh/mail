@@ -6,7 +6,7 @@
         {
           "field": "received_at",
           "operator": "less_than",
-          "value": 18,
+          "value": 36,
           "metric": "hours"
         },
         {

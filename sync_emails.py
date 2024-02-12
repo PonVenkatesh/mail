@@ -41,10 +41,6 @@ class GmailMessage:
 class Gmail:
     def __init__(self):
         self.service = self.authenticate_gmail_api()
-        # self.user_df = {"user_id": [], "user_name": []}
-        # self.mail_df = {"email_id": [], "subject": [], "body": [], "sender_id": [], "received_at": []}
-        # self.attachment_df = {"attachment_id": [], "filename": [], "data": [], "email_id": []}
-        # self.label_df = {"label_id": [], "email_id": []}
         self.user_data = []
         self.mail_data = []
         self.attachment_data = []
@@ -71,7 +67,7 @@ class Gmail:
         return build("gmail", "v1", credentials=creds)
 
     def prepare_datasets(self, message):
-        # Preparing dataframes to push the data to Postgres
+        # Preparing datasets to push the data to Postgres
         if " <" in message.sender:
             user_name, user_id = message.sender.split(" <")
         else:
@@ -123,7 +119,6 @@ class Gmail:
     def get_email_content(self, email_id):
         # Get the content of a specific email
         email = self.service.users().messages().get(userId="me", id=email_id).execute()
-        print(email)
         sender = None
         receiver = None
         subject = None
@@ -141,7 +136,7 @@ class Gmail:
             received_at = email.get("internalDate")
             label_ids = email.get("labelIds", [])
             if "parts" not in email["payload"]:
-                body = email["payload"]["body"]["data"]
+                body = email["payload"]["body"].get("data")
             else:
                 for part in email["payload"]["parts"]:
                     if "data" in part["body"]:
@@ -154,7 +149,6 @@ class Gmail:
                         if attachment_id:
                             att = self.service.users().messages().attachments().get(
                                 userId='me', id=attachment_id, messageId=email_id).execute()
-                            print(att)
                             attachment_data = att['data']
                         if attachment_data:
                             save_folder = f"attachments/{email_id}"
@@ -176,11 +170,11 @@ def main():
     failed_mail_ids = []
     all_emails = gmail.list_emails(query="")
     if all_emails:
-        # Get content of each email
-        for each in all_emails[:10]:
+        for each in all_emails[:30]:
             try:
                 email_id = each.get("id")
                 if email_id:
+                    # Get content of each email
                     sender, receiver, subject, body, received_at, label_ids, attachment_data, attachment_id, filename = gmail.get_email_content(
                         email_id)
                     if sender:
@@ -192,7 +186,7 @@ def main():
                 failed_mail_ids.append(each["id"])
 
         push_data_to_postgres(gmail)
-        print(" Failed Mail Ids : {}".format(failed_mail_ids))
+        # print(" Failed Mail Ids : {}".format(failed_mail_ids))
     else:
         print("No emails found.")
 

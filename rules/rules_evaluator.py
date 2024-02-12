@@ -13,25 +13,27 @@ class RulesEvaluator:
         for rule in self.rules:
             matching_mail_ids_per_condition_list = []
             for condition in rule.get("conditions", []):
-                print(condition.get("field"))
                 if condition.get("field") in list(EVALUATOR_OBJ_MAP.keys()):
                     if EVALUATOR_OBJ_MAP[condition.get("field")]().is_valid_operator(condition):
-                        print(" IN In In")
                         matching_mail_ids = EVALUATOR_OBJ_MAP[condition.get("field")]().evaluate(condition, self.email_data)
-                        print(matching_mail_ids)
                         matching_mail_ids_per_condition_list.append(matching_mail_ids)
             print(matching_mail_ids_per_condition_list)
             if rule.get("conditions_relation", "AND") == "OR":
                 result_email_ids = flatten_list(matching_mail_ids_per_condition_list)
             elif rule.get("conditions_relation", "AND") == "AND":
-                print(" AND")
                 result_email_ids = intersection_list(matching_mail_ids_per_condition_list)
             else:
                 print(" Invalid conditions_relation : {}".format(rule.get("conditions_relation")))
                 continue
-            print(" mail_ids matching with the conditions : {}".format(list(set(result_email_ids))))
-            if result_email_ids:
-                ActionsController(self, result_email_ids, rule.get("actions", [])).validate_action().perform()
+            #taking unique mail_ids
+            result_email_ids = list(set(result_email_ids))
+            print(" mail_ids matching with the conditions : {}".format(result_email_ids))
+            try:
+                if result_email_ids:
+                    ActionsController(self, result_email_ids, rule.get("actions", [])).validate_action().perform()
+            except Exception as e:
+                print(e.args[0])
+                continue
 
 def intersection_list(list_of_lists):
     common_set = set(list_of_lists[0])

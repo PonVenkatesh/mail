@@ -21,7 +21,7 @@ def create_gmail_schema():
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS "User" (
     user_id VARCHAR(255) PRIMARY KEY,
-    username VARCHAR(255) NOT NULL
+    user_name VARCHAR(255) NOT NULL
 );
 
         """)
@@ -50,7 +50,7 @@ def create_gmail_schema():
         # Create Email_Label table
         cursor.execute("""
            CREATE TABLE IF NOT EXISTS Email_Label (
-                email_label_id SERIAL PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 email_id VARCHAR(255) REFERENCES Email(email_id),
                 label_id VARCHAR(255)
             )
