@@ -69,4 +69,41 @@ CREATE DATABASE your_database_name;
 5. update postgres details in _global_constants.py_ and create necessary tables using the _create_tables.py_.
    ```bash
    python create_tables.py
-6. Run `python sync_emails.py`
+6. Run sync emails python file `python sync_emails.py`
+7. Verify the data in Postgres
+8. Define the rules in _**rules.json**_ inside the **rules** directory
+   1. Each rule have set of conditions
+   2. Each condition has gamil field name which should be matched with the given value.
+   3. conditions_relation will have AND / OR value. by default its AND.
+   4. Each rule have set of actions like move to another mailbox, mark as read or unread.
+
+      if the condition_relation is AND, then the mail_id should match with all conditions
+      if the condition_relation is OR, then the mail_id should match with any one condition.
+   Sample Rule : 
+   ```bash
+   {
+    "name": "mutual_fund_attachment",
+    "conditions": [
+        {
+            "field": "attachment",
+            "operator": "exists"
+        },
+        {
+            "field": "subject",
+            "operator": "contains",
+            "value": "mutual"
+        }
+    ],
+    "conditions_relation": "AND",
+    "actions": [
+        {
+            "action": "move_to",
+            "value": "Label_3569484908781157165"
+        },
+        {
+            "action": "mark_as",
+            "value": "unread"
+        }
+    ]}
+9. Run process emails python file `python process_emails.py`
+10. Open Gmail and verify the results.

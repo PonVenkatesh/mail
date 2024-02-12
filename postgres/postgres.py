@@ -74,12 +74,12 @@ def fetch_data_from_postgres():
         cursor = conn.cursor()
         # SQL query
         query = """
-            SELECT e.email_id, e.sender_id, e.subject, e.body, e.received_at, u.user_id, a.attachment_id, a.filename, ARRAY_AGG(l.label_id) AS label_ids
+            SELECT e.email_id, e.sender_id, e.subject, e.body, e.received_at, u.user_id, a.filename, ARRAY_AGG(l.label_id) AS label_ids
             FROM email e
             JOIN public.user u ON e.sender_id = u.user_id
             LEFT JOIN attachment a ON e.email_id = a.email_id
             LEFT JOIN label l ON e.email_id = l.email_id
-            GROUP BY e.email_id, u.user_id, a.attachment_id;
+            GROUP BY e.email_id, u.user_id, a.filename;
         """
         cursor.execute(query)
 
@@ -96,9 +96,8 @@ def fetch_data_from_postgres():
                 'body': row[3],
                 'received_at': row[4],
                 'user_id': row[5],
-                'attachment_id': row[6],
-                'filename': row[7],
-                'label_ids': row[8],
+                'filename': row[6],
+                'label_ids': row[7],
             }
             email_data_list.append(email_data)
 
