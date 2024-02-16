@@ -135,6 +135,9 @@ class Gmail:
             subject = [header["value"] for header in email["payload"]["headers"] if header["name"] == "Subject"][0]
             received_at = email.get("internalDate")
             label_ids = email.get("labelIds", [])
+            '''
+            if email has multipart, body will be available inside the parts key
+            '''
             if "parts" not in email["payload"]:
                 body = email["payload"]["body"].get("data")
             else:
@@ -142,25 +145,32 @@ class Gmail:
                     if "data" in part["body"]:
                         # body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8")
                         body = part["body"]["data"]
+                    '''
+                    fetching the attachment
+                    '''
                     if "filename" in part and part["filename"]:
-                        attachment_name = part["filename"]
-                        attachment_id = part['body'].get('attachmentId')
-                        attachment_data = None
-                        if attachment_id:
-                            att = self.service.users().messages().attachments().get(
-                                userId='me', id=attachment_id, messageId=email_id).execute()
-                            attachment_data = att['data']
-                        if attachment_data:
-                            save_folder = f"attachments/{email_id}"
-                            os.makedirs(save_folder, exist_ok=True)
-                            save_path = os.path.join(save_folder, attachment_name)
-                            with open(save_path, "wb") as file:
-                                file.write(base64.urlsafe_b64decode(attachment_data.encode('UTF-8')))
-                            print(f"Attachment '{attachment_name}' downloaded to '{save_path}'.")
+                        attachment_name, attachment_id, attachment_data = self.get_attachment_data(email_id, part)
         except Exception as e:
             print(traceback.format_exc())
             print("Email body parsing failed")
         return sender, receiver, subject, body, received_at, label_ids, attachment_data, attachment_id, attachment_name
+
+    def get_attachment_data(self, email_id, part):
+        attachment_name = part["filename"]
+        attachment_id = part['body'].get('attachmentId')
+        attachment_data = None
+        if attachment_id:
+            att = self.service.users().messages().attachments().get(
+                userId='me', id=attachment_id, messageId=email_id).execute()
+            attachment_data = att['data']
+        if attachment_data:
+            save_folder = f"attachments/{email_id}"
+            os.makedirs(save_folder, exist_ok=True)
+            save_path = os.path.join(save_folder, attachment_name)
+            with open(save_path, "wb") as file:
+                file.write(base64.urlsafe_b64decode(attachment_data.encode('UTF-8')))
+            print(f"Attachment '{attachment_name}' downloaded to '{save_path}'.")
+        return attachment_name, attachment_id, attachment_data
 
 
 def main():
@@ -182,11 +192,13 @@ def main():
                         mail_message = GmailMessage(email_id, sender, receiver, subject, body, received_at, label_ids,
                                                     attachment_data, attachment_id, filename).pre_process_data()
                         gmail.prepare_datasets(mail_message)
+                    else:
+                        failed_mail_ids.append(each["id"])
             except Exception as e:
                 failed_mail_ids.append(each["id"])
 
         push_data_to_postgres(gmail)
-        # print(" Failed Mail Ids : {}".format(failed_mail_ids))
+        print(" Failed Mail Ids : {}".format(failed_mail_ids))
     else:
         print("No emails found.")
 
