@@ -92,7 +92,7 @@ def date_fields_validation(field_value, operator, matching_value, metric):
         elif metric == "hours":
             return time_difference_seconds > (matching_value * 3600)
         elif metric == "mins":
-            return time_difference_seconds < (matching_value * 60)
+            return time_difference_seconds > (matching_value * 60)
     return False
 
 class SenderIdEvaluator:
@@ -159,12 +159,12 @@ class ReceivedAtEvaluator:
     def evaluate(self, condition, dataset):
         matching_email_ids = []
         for each in dataset:
-            print(each.get(self.field_name))
             if each.get(self.field_name):
-                print(" hereeee")
                 if date_fields_validation(each.get(self.field_name), condition.get("operator"), condition.get("value"), condition.get("metric")):
                     matching_email_ids.append(each["email_id"])
         return matching_email_ids
+
+
 
 EVALUATOR_OBJ_MAP = {
     "sender_id": SenderIdEvaluator,
