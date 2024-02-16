@@ -60,8 +60,8 @@ This guide provides step-by-step instructions for installing PostgreSQL on diffe
 **macOS/Linux:** Access the PostgreSQL command line using the psql tool
     ```psql -U postgres```
 
-###Create a new database:
-
+### Create a new database:
+4. run the below command to create a database. 
 ```sql
 CREATE DATABASE your_database_name;
 ```
@@ -73,13 +73,13 @@ CREATE DATABASE your_database_name;
 7. Verify the data in Postgres
 8. Define the rules in _**rules.json**_ inside the **rules** directory
    1. Each rule have set of conditions
-   2. Each condition has gamil field name which should be matched with the given value.
+   2. Each condition has gmail field name which should be matched with the given value.
    3. conditions_relation will have AND / OR value. by default its AND.
    4. Each rule have set of actions like move to another mailbox, mark as read or unread.
 
       if the condition_relation is AND, then the mail_id should match with all conditions
       if the condition_relation is OR, then the mail_id should match with any one condition.
-   Sample Rule : 
+   **Sample Rule : **
    ```bash
    {
     "name": "mutual_fund_attachment",
